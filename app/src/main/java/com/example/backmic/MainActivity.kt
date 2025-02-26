@@ -1,37 +1,62 @@
 package com.example.backmic
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.backmic.service.AudioRecordService
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val startButton: Button = findViewById(R.id.startButton)
-        val stopButton: Button = findViewById(R.id.stopButton)
-
-        startButton.setOnClickListener {
-            startRecordingService()
-        }
-
-        stopButton.setOnClickListener {
-            stopRecordingService()
+        setContent {
+            MaterialTheme {
+                Surface(modifier = Modifier.padding(16.dp)) {
+                    Column {
+                        StartStopButtons()
+                    }
+                }
+            }
         }
     }
+}
 
-    private fun startRecordingService() {
-        val serviceIntent = Intent(this, AudioRecordService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
+@Composable
+fun StartStopButtons() {
+    val context = LocalContext.current
+
+    Button(onClick = {
+        startRecordingService(context)
+    }) {
+        Text("Start Recording")
     }
 
-    private fun stopRecordingService() {
-        val serviceIntent = Intent(this, AudioRecordService::class.java)
-        stopService(serviceIntent)
+    Button(onClick = {
+        stopRecordingService(context)
+    }) {
+        Text("Stop Recording")
     }
+}
+
+fun startRecordingService(context: Context) {
+    val serviceIntent = Intent(context, AudioRecordService::class.java)
+    ContextCompat.startForegroundService(context, serviceIntent)
+}
+
+fun stopRecordingService(context: Context) {
+    val serviceIntent = Intent(context, AudioRecordService::class.java)
+    context.stopService(serviceIntent)
 }
